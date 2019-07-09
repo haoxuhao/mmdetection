@@ -12,6 +12,25 @@ def voc_classes():
         'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor'
     ]
 
+def yaogan_classes():
+    return ['large-vehicle',
+        'swimming-pool',
+        'helicopter',
+        'bridge',
+        'plane',
+        'ship',
+        'soccer-ball-field',
+        'basketball-court',
+        'airport',
+        'container-crane',
+        'ground-track-field',
+        'small-vehicle',
+        'harbor',
+        'baseball-diamond',
+        'tennis-court',
+        'roundabout',
+        'storage-tank',
+        'helipad',]
 
 def imagenet_det_classes():
     return [
@@ -87,7 +106,8 @@ dataset_aliases = {
     'imagenet_det': ['det', 'imagenet_det', 'ilsvrc_det'],
     'imagenet_vid': ['vid', 'imagenet_vid', 'ilsvrc_vid'],
     'coco': ['coco', 'mscoco', 'ms_coco'],
-    'wider_face': ['WIDERFaceDataset', 'wider_face', 'WDIERFace']
+    'wider_face': ['WIDERFaceDataset', 'wider_face', 'WDIERFace'],
+    'yaogan': ["yaogan"],
 }
 
 
