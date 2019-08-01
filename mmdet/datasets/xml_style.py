@@ -26,8 +26,8 @@ class XMLDataset(CustomDataset):
             tree = ET.parse(xml_path)
             root = tree.getroot()
             size = root.find('size')
-            width = int(size.find('width').text)
-            height = int(size.find('height').text)
+            width = int(float(size.find('width').text))
+            height = int(float(size.find('height').text))
             img_infos.append(
                 dict(id=img_id, filename=filename, width=width, height=height))
         return img_infos
@@ -48,10 +48,10 @@ class XMLDataset(CustomDataset):
             difficult = int(obj.find('difficult').text)
             bnd_box = obj.find('bndbox')
             bbox = [
-                int(bnd_box.find('xmin').text),
-                int(bnd_box.find('ymin').text),
-                int(bnd_box.find('xmax').text),
-                int(bnd_box.find('ymax').text)
+                int(float(bnd_box.find('xmin').text)),
+                int(float(bnd_box.find('ymin').text)),
+                int(float(bnd_box.find('xmax').text)),
+                int(float(bnd_box.find('ymax').text))
             ]
             ignore = False
             if self.min_size:

@@ -178,6 +178,15 @@ class CustomDataset(Dataset):
         img_info = self.img_infos[idx]
         # load image
         img = mmcv.imread(osp.join(self.img_prefix, img_info['filename']))
+
+        #crop image if needed
+        if 'crop' in img_info: #img: (h, w, c)
+            sx, sy, ex, ey = img_info['crop']
+            img = img[sy:ey, sx:ex, :]
+            img_info['width'] = ex-sx
+            img_info['height'] = ey-sy
+            #print("crop one image")
+
         # load proposals if necessary
         if self.proposals is not None:
             proposals = self.proposals[idx][:self.num_max_proposals]
@@ -269,6 +278,13 @@ class CustomDataset(Dataset):
         """Prepare an image for testing (multi-scale and flipping)"""
         img_info = self.img_infos[idx]
         img = mmcv.imread(osp.join(self.img_prefix, img_info['filename']))
+        #crop image if needed
+        if 'crop' in img_info: #img: (h, w, c)
+            sx, sy, ex, ey = img_info['crop']
+            img = img[sy:ey, sx:ex, :]
+            img_info['width'] = ex-sx
+            img_info['height'] = ey-sy
+            #print("crop one image")
         if self.proposals is not None:
             proposal = self.proposals[idx][:self.num_max_proposals]
             if not (proposal.shape[1] == 4 or proposal.shape[1] == 5):
