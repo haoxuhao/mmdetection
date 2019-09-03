@@ -6,7 +6,7 @@ import numpy as np
 
 from .custom import CustomDataset
 from .registry import DATASETS
-
+from PIL import Image
 
 @DATASETS.register_module
 class XMLDataset(CustomDataset):
@@ -17,9 +17,27 @@ class XMLDataset(CustomDataset):
         self.min_size = min_size
 
     def load_annotations(self, ann_file):
+        #test_mode = False
+        wind_size = 1080
         img_infos = []
+        print(ann_file)
         img_ids = mmcv.list_from_file(ann_file)
+        
+        print(img_ids[:3])
+        print(self.test_mode)
         for img_id in img_ids:
+            if self.test_mode:
+                #img_prefix="/root/datasets/testset/split_images_new/"
+                #filename = "JPEGImages/{}.jpg".format(img_id)
+                real_img_id, crop_x, crop_y = img_id.split("_")
+                filename = "JPEGImages/{}.jpg".format(real_img_id)
+                crop = [int(crop_x), int(crop_y), int(crop_x)+wind_size, int(crop_y)+wind_size]
+                # img_file = img_prefix+filename
+                # w,h = Image.open(img_file).size
+                w = h = wind_size
+                img_infos.append(dict(id=real_img_id, filename=filename, width=w, height=h, crop=crop))
+                continue
+
             filename = 'JPEGImages/{}.jpg'.format(img_id)
             xml_path = osp.join(self.img_prefix, 'Annotations',
                                 '{}.xml'.format(img_id))

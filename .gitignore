@@ -108,6 +108,7 @@ mmdet/ops/nms/src/soft_nms_cpu.cpp
 mmdet/version.py
 data/datasets
 data/tmp
+data/results
 # !data/reports/*
 .vscode
 .idea
@@ -118,5 +119,6 @@ data/tmp
 *.log.json
 work_dirs/
 checkpoints
-
+data/postprocess/results
+data/postprocess/gen_final_results
 

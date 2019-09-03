@@ -261,8 +261,8 @@ def eval_map(det_results,
         cls_dets, cls_gts, cls_gt_ignore = get_cls_results(
             det_results, gt_bboxes, gt_labels, gt_ignore, i)
         # calculate tp and fp for each image
-        tpfp_func = (
-            tpfp_imagenet if dataset in ['det', 'vid'] else tpfp_default)
+        tpfp_func = (tpfp_imagenet
+                     if dataset in ['det', 'vid'] else tpfp_default)
         tpfp = [
             tpfp_func(cls_dets[j], cls_gts[j], cls_gt_ignore[j], iou_thr,
                       area_ranges) for j in range(len(cls_dets))
@@ -285,6 +285,7 @@ def eval_map(det_results,
         cls_dets = np.vstack(cls_dets)
         num_dets = cls_dets.shape[0]
         sort_inds = np.argsort(-cls_dets[:, -1])
+        sort_threshs = np.sort(-cls_dets[:, -1])
         tp = np.hstack(tp)[:, sort_inds]
         fp = np.hstack(fp)[:, sort_inds]
         # calculate recall and precision with tp and fp
@@ -305,8 +306,11 @@ def eval_map(det_results,
             'num_dets': num_dets,
             'recall': recalls,
             'precision': precisions,
-            'ap': ap
+            'ap': ap,
+            "sort_threshs":sort_threshs
         })
+        #print(recalls.shape)
+        
     if scale_ranges is not None:
         # shape (num_classes, num_scales)
         all_ap = np.vstack([cls_result['ap'] for cls_result in eval_results])
@@ -343,6 +347,9 @@ def print_map_summary(mean_ap, results, dataset=None):
 
     recalls = np.zeros((num_scales, num_classes), dtype=np.float32)
     precisions = np.zeros((num_scales, num_classes), dtype=np.float32)
+
+    f1_score=None
+    sort_threshs=None
     aps = np.zeros((num_scales, num_classes), dtype=np.float32)
     num_gts = np.zeros((num_scales, num_classes), dtype=int)
     for i, cls_result in enumerate(results):
@@ -350,6 +357,12 @@ def print_map_summary(mean_ap, results, dataset=None):
             recalls[:, i] = np.array(cls_result['recall'], ndmin=2)[:, -1]
             precisions[:, i] = np.array(
                 cls_result['precision'], ndmin=2)[:, -1]
+            pre_add_recall = np.array(cls_result['recall'], ndmin=2) + np.array(cls_result['precision'], ndmin=2)
+            pre_mul_recall = np.array(cls_result['recall'], ndmin=2) * np.array(cls_result['precision'], ndmin=2)
+            f1_scores = 2*pre_mul_recall/pre_add_recall
+            sort_threshs = cls_result["sort_threshs"]
+
+
         aps[:, i] = cls_result['ap']
         num_gts[:, i] = cls_result['num_gts']
 
@@ -362,14 +375,23 @@ def print_map_summary(mean_ap, results, dataset=None):
 
     if not isinstance(mean_ap, list):
         mean_ap = [mean_ap]
-    header = ['class', 'gts', 'dets', 'recall', 'precision', 'ap']
+    header = ['class', 'gts', 'dets', 'recall', 'precision', 'ap', 'max_f1_score']
     for i in range(num_scales):
         table_data = [header]
         for j in range(num_classes):
+            max_f1_score_idx = np.argmax(f1_scores[0])
+            max_f1_score = f1_scores[0, max_f1_score_idx]
+            score_thresh = sort_threshs[max_f1_score_idx]
+            recalls_tmp = cls_result['recall']
+            precisions_tmp = cls_result['precision']
+            print("best recall: %.4f"%recalls_tmp[max_f1_score_idx])
+            print("best precisions: %.4f"%precisions_tmp[max_f1_score_idx])
+            
             row_data = [
                 label_names[j], num_gts[i, j], results[j]['num_dets'],
                 '{:.3f}'.format(recalls[i, j]), '{:.3f}'.format(
-                    precisions[i, j]), '{:.3f}'.format(aps[i, j])
+                    precisions[i, j]), '{:.3f}'.format(aps[i, j]),
+                    '{:.3f}@({}/{}); score_thresh@{:.4f}'.format(max_f1_score, max_f1_score_idx, results[j]['num_dets'],np.fabs(score_thresh))
             ]
             table_data.append(row_data)
         table_data.append(['mAP', '', '', '', '', '{:.3f}'.format(mean_ap[i])])

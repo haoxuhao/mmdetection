@@ -1,6 +1,14 @@
 # model settings
 model = dict(
     type='RetinaNet',
+    #pretrained='modelzoo://resnet50',
+    #backbone=dict(
+    #    type='ResNet',
+    #    depth=50,
+    #    num_stages=4,
+    #    out_indices=(0, 1, 2, 3),
+    #    frozen_stages=1,
+    #    style='pytorch'),
     pretrained='open-mmlab://resnext101_32x4d',
     backbone=dict(
         type='ResNeXt',
@@ -27,7 +35,7 @@ model = dict(
         octave_base_scale=4,
         scales_per_octave=3,
         octave_ratios=[0.5, 1.0, 2.0],
-        anchor_strides=[8, 16, 32, 64, 128],
+        anchor_strides=[4, 8, 16, 32, 64],
         anchor_base_sizes=None,
         anchoring_means=[.0, .0, .0, .0],
         anchoring_stds=[1.0, 1.0, 1.0, 1.0],
@@ -78,7 +86,7 @@ test_cfg = dict(
     min_bbox_size=0,
     score_thr=0.05,
     nms=dict(type='nms', iou_thr=0.35),
-    max_per_img=100)
+    max_per_img=250)
 # dataset settings
 dataset_type = 'HangkongbeiDataset'
 data_root = '/mnt/nfs/hangkongbei/'
@@ -122,11 +130,11 @@ img_norm_cfg = dict(
 #         with_label=False,
 #         test_mode=True))
 data = dict(
-    imgs_per_gpu=6,
+    imgs_per_gpu=1,
     workers_per_gpu=4,
     train=dict(
         type='RepeatDataset',  # to avoid reloading datasets frequently
-        times=2,
+        times=1,
         dataset=dict(
             type=dataset_type,
             ann_file=[
@@ -134,7 +142,7 @@ data = dict(
                 #data_root + 'VOC2012/ImageSets/Main/trainval.txt'
             ],
             img_prefix=[data_root + 'voc-style/split_dataset'],
-            img_scale=[(800, 800), (1600, 1600)],
+            img_scale=[(800, 800), (1080, 1080)],#(1080, 1080)
             multiscale_mode="range",
             img_norm_cfg=img_norm_cfg,
             size_divisor=32,
@@ -143,25 +151,25 @@ data = dict(
             with_crowd=True,
             with_label=True,
             #data aug
-            # extra_aug=dict(
-            #     photo_metric_distortion=dict(
-            #         brightness_delta=32,
-            #         contrast_range=(0.8, 1.2),
-            #         saturation_range=(0.8, 1.2),
-            #         hue_delta=18),
-            #         # expand=dict(
-            #         #     mean=img_norm_cfg['mean'],
-            #         #     to_rgb=img_norm_cfg['to_rgb'],
-            #         #     ratio_range=(1, 4)),
-            #         # random_crop=dict(
-            #         #     min_ious=(0.1, 0.3, 0.5, 0.7, 0.9), min_crop_size=0.6)
-            #     ),
+            extra_aug=dict(
+                photo_metric_distortion=dict(
+                    brightness_delta=32,
+                    contrast_range=(0.8, 1.2),
+                    saturation_range=(0.8, 1.2),
+                    hue_delta=18),
+                    expand=dict(
+                        mean=img_norm_cfg['mean'],
+                        to_rgb=img_norm_cfg['to_rgb'],
+                        ratio_range=(1, 4)),
+                    random_crop=dict(
+                        min_ious=(0.1, 0.3, 0.5, 0.7, 0.9), min_crop_size=0.6)
+                ),
             resize_keep_ratio=False)),
     val=dict(
         type=dataset_type,
         ann_file=data_root + 'voc-style/split_dataset/ImageSets/Main/val.txt',
         img_prefix=data_root + 'voc-style/split_dataset/',
-        img_scale=(800, 800),
+        img_scale=(1080, 1080),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0,
@@ -171,11 +179,11 @@ data = dict(
        ),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'voc-style/split_dataset/ImageSets/Main/val.txt',
-        img_prefix=data_root + 'voc-style/split_dataset/',
-        #img_scale=[(608,608),(800, 800),(1080, 1080)],
-        img_scale=(1080,1080),
-        multiscale_mode="value",
+        ann_file=data_root + 'voc-style/ImageSets/Main/val.txt',
+        img_prefix = data_root+"voc-style",
+	    # ann_file = data_root+"testset/test.txt",
+        # img_prefix=data_root + 'testset/split_test_images/',
+        img_scale=[(800,800),(1080, 1080),(1280,1280)],
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0,
@@ -197,18 +205,18 @@ lr_config = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=50,
+    interval=10,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 12
-device_ids = range(0)
+total_epochs = 25
+device_ids = range(2)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/ga_retinanet_x101_32x4d_fpn_1x'
+work_dir = './work_dirs/ga_retinanet_x100_32x4d_fpn_1x_multi_scale_split_small_anchors'
 load_from = None
 resume_from = None
-workflow = [('train', 1)] #[('train', 2), ('val', 1)]
+workflow = [('train', 1)]#[('train', 1)] #

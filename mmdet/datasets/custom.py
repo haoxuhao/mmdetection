@@ -58,7 +58,10 @@ class CustomDataset(Dataset):
                  test_mode=False):
         # prefix of images path
         self.img_prefix = img_prefix
-
+        self.test_mode = test_mode
+        self.test_mode = True
+        print(self.test_mode)
+        
         # load annotations (and proposals)
         self.img_infos = self.load_annotations(ann_file)
         if proposal_file is not None:

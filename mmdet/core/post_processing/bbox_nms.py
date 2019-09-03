@@ -27,6 +27,8 @@ def multiclass_nms(multi_bboxes,
             are 0-based.
     """
     num_classes = multi_scores.shape[1]
+    # print(multi_scores.shape)
+    # print(multi_scores[0, 1], multi_scores[0,1])
     bboxes, labels = [], []
     nms_cfg_ = nms_cfg.copy()
     nms_type = nms_cfg_.pop('type', 'nms')

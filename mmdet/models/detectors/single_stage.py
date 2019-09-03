@@ -4,7 +4,10 @@ from .base import BaseDetector
 from .. import builder
 from ..registry import DETECTORS
 from mmdet.core import bbox2result
-
+import numpy as np
+from nms import nms
+from mmdet.core.post_processing.bbox_nms import multiclass_nms
+import torch
 
 @DETECTORS.register_module
 class SingleStageDetector(BaseDetector):
@@ -67,4 +70,38 @@ class SingleStageDetector(BaseDetector):
         return bbox_results[0]
 
     def aug_test(self, imgs, img_metas, rescale=False):
-        raise NotImplementedError
+        # raise NotImplementedError
+        bbox_results_ret=[]
+
+        for i, img in enumerate(imgs):
+            x = self.extract_feat(img)
+            outs = self.bbox_head(x)  
+
+            bbox_inputs = outs + (img_metas[i], self.test_cfg, rescale)
+            bbox_list = self.bbox_head.get_bboxes(*bbox_inputs)
+            bbox_results = [
+                bbox2result(det_bboxes, det_labels, self.bbox_head.num_classes)
+                for det_bboxes, det_labels in bbox_list
+            ]
+
+            bbox_results_ret.append(bbox_results[0][0])
+ 
+        
+        ret = np.concatenate(bbox_results_ret, axis=0)
+
+        bboxes = ret[:,:4].copy()
+        bboxes[:,2] = ret[:,2] - ret[:, 0]
+        bboxes[:,3] = ret[:,3] - ret[:, 1]
+        # scores = ret[:,4].tolist()
+
+        multiscores = ret[:,4].reshape(ret[:,4].shape[0],1)
+        zeros_dim = np.zeros(multiscores.shape)
+
+        multiscores = np.concatenate((zeros_dim, multiscores), axis=1)
+
+        det_bboxes, det_labels = multiclass_nms(torch.Tensor(ret[:,:4]), torch.Tensor(multiscores),self.test_cfg.score_thr, self.test_cfg.nms,
+                                                    self.test_cfg.max_per_img)
+
+        bboxes = [bbox2result(det_bboxes, det_labels, self.bbox_head.num_classes)]
+
+        return bboxes[0]
