@@ -23,15 +23,16 @@ def read_pkl(pkl_file):
     return results
 
 # dataset_root = "/mnt/nfs/hangkongbei/voc-style"
-dataset_root = '/root/datasets/testset'
+dataset_root = '/openbayes/home/mmdetection/data/preprocess/testset'
+inputdata_root = '/openbayes/input/input0/'
 
-org_images_id_file = osp.join(dataset_root, "ImageSets/Main/test.txt")
-org_images_dir = osp.join(dataset_root, "JPEGImages")
-test_images_id_file = osp.join(dataset_root, "ImageSets/Main/test_split_new.txt") #split_dataset_new
+org_images_id_file = osp.join(dataset_root, "ImageSets/Main/minival.txt")
+org_images_dir = osp.join(inputdata_root, "JPEGImages")
+test_images_id_file = osp.join(dataset_root, "ImageSets/Main/minival_split_new.txt") #split_dataset_new
 
 
-input_results_file = "pkl_results/results_testset.pkl"
-out_results_name = "results_testset_split_new_best_merge_allimages.pkl"
+input_results_file = "pkl_results/minival_results.pkl"
+out_results_name = "minival_results_merge.pkl"
 
 pkl_save_dir = "./pkl_results_merge"
 if not osp.exists(pkl_save_dir):
@@ -71,7 +72,7 @@ for i in tqdm(range(len(org_imageids))):
         #print(split_imageid, org_imageid)
         if split_imageid == org_imageid:
             split_result = input_results[j][0]
-            print(split_result.shape, offset_x, offset_y)
+            #print(split_result.shape, offset_x, offset_y)
             #print("equal", split_imageid, org_imageid)
             #remove box on left line
             if offset_x != 0:
