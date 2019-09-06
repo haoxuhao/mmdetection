@@ -9,24 +9,26 @@ import threading
 
 dataset_root = "/mnt/nfs/hangkongbei"
 dataset_root = "/root/datasets/testset"
+input_root = "/openbayes/input/input0"
+output_dataset = "./testset"
 
 # images_dir = "/root/datasets/testset/JPEGImages"
 # imagesets_dir = "/root/datasets/testset/ImageSets/Main"
 # anns_dir = "/root/datasets/testset/Annotations"
 
-images_dir = osp.join(dataset_root, "JPEGImages")
-imagesets_dir = osp.join(dataset_root, "ImageSets/Main")
-anns_dir = osp.join(dataset_root, "Annotations")
+images_dir = osp.join(input_root, "JPEGImages")
+imagesets_dir = osp.join(output_dataset, "ImageSets/Main")
+anns_dir = osp.join(input_root, "Annotations")
 
 # split_dataset_root = osp.join(dataset_root, "split_dataset_new")
-split_dataset_root = dataset_root
+split_dataset_root = output_dataset
 
 split_images_dir = osp.join(split_dataset_root, "split_images_new")
 split_imagesets_dir = osp.join(split_dataset_root, "ImageSets/Main")
 split_anns_dir = osp.join(split_dataset_root, "Annotations")
 
-to_process_set_name = "test.txt"
-out_set_name = "minitest_split_new.txt"
+to_process_set_name = "minival.txt"
+out_set_name = "minival_split_new.txt"
 
 if not osp.exists(split_images_dir):
     os.makedirs(split_images_dir)
@@ -116,7 +118,7 @@ wind_size = 1080
 overlap = 360
 stride = wind_size-overlap
 split_xml = False
-save_image = True
+save_image = False
 
 outfile = open(output_set_path,"w")
 ext = "jpeg"

@@ -119,6 +119,7 @@ data/results
 *.log.json
 work_dirs/
 checkpoints
+data/preprocess/testset
 data/postprocess/results
 data/postprocess/gen_final_results
 
