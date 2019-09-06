@@ -35,23 +35,25 @@ if __name__=="__main__":
     #     images = json.load(f)["images"]
     #     img_paths = [osp.join(image_dir, file["file_name"]) for file in images]
 
-    # data_root = '/mnt/nfs/hangkongbei/test_images'
+    data_root = '/mnt/nfs/hangkongbei/test_images'
 
-    data_root = "/root/datasets/testset/split_images_new"
+    #data_root = "/root/datasets/testset/split_images_new"
     image_dir = data_root
     #image_dir = osp.join(data_root, "voc-style/split_dataset/JPEGImages")
     
     # with open(osp.join(data_root, "voc-style/split_dataset/ImageSets/Main/val.txt")) as f:
     #     imageids = [file.strip() for file in f.readlines() if file.strip()!=""]
-    org_imageids = ["00013868","00013873", "00013874", "00013875", "00013876", "00100122"]
-    split_testset_path = "/root/datasets/testset/ImageSets/Main/test_split_new.txt"
-    with open(split_testset_path, "r") as f:
-        split_imageids = [line.strip() for line in f.readlines()]
+   
+    # org_imageids = ["00013868","00013873", "00013874", "00013875", "00013876", "00100122"]
+    # split_testset_path = "/root/datasets/testset/ImageSets/Main/test_split_new.txt"
+    # with open(split_testset_path, "r") as f:
+    #     split_imageids = [line.strip() for line in f.readlines()]
 
-    imageids = []
-    for imageid in org_imageids:
-        imageids += [line for line in split_imageids if line.split("_")[0] == imageid]
-
+    # imageids = []
+    # for imageid in org_imageids:
+    #     imageids += [line for line in split_imageids if line.split("_")[0] == imageid]
+    
+    imageids = ['00010030_2160_0']
     # imageids = ["00010030_0_0",\
     #      "00010030_1440_720","00010030_720_0","00010030_0_720","00010030_2160_0","00010030_720_720","00010030_1440_0",\
     #          "00010030_2160_720"]#'00000029_left','00000069_left','10001204_left','00010835_right','00010030_left','10004210_left','00010023_right','00010763_right','00010757_right','00010763_left','10001156_left','00010884_right','10004202_left','00010853_right','00010030_right','00000053_right','00010031_left','00010803_left','00010787_left','00010846_right','00000028_left','00010835_left','00010757_left','00010852_right','00000029_right','00010784_right','00010023_left','10001503_left','00010883_left',]
@@ -60,5 +62,5 @@ if __name__=="__main__":
 
     # build the model from a config file and a checkpoint file
     model = init_detector(config_file, checkpoint_file, device='cuda:0')
-    vis_images(model, img_paths, save_dir="./data/results/testset_vis", score_thr=0.6)
+    vis_images(model, img_paths, save_dir="./data/results/inputsize_test_vis", score_thr=0.6)
 

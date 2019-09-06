@@ -71,13 +71,13 @@ dataset_root = "/mnt/nfs/hangkongbei/voc-style"
 dataset_root = '/root/datasets/testset'
 image_dir = osp.join(dataset_root, "JPEGImages")
 val_set_path = osp.join(dataset_root, "ImageSets/Main/test.txt")
-result_file = "./pkl_results_merge/results_testset_split_new_best_merge_allimages.pkl"
-txt_file_save_dir = "./results/final_results_testset_allimages_multiscale_txt_dir"
+result_file = "./pkl_results_merge/results_testset_resampled_finetune_merged.pkl"
+txt_file_save_dir = "./results/results_testset_resampled_finetune_merged_txt_dir"
 vis_results = True
-vis_results_save_dir = "./results/final_results_testset_allimages_multiscale_higherthresh_txt_dir_vis"
+vis_results_save_dir = "./results/results_testset_resampled_finetune_merged_txt_dir_vis"
                         
 #global
-thresh = 0.6
+thresh = 0.51
 
 with open(val_set_path, "r") as f:
     imageids = [file.strip() for file in f.readlines()]

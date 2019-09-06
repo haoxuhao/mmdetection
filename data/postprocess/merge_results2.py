@@ -30,8 +30,8 @@ org_images_dir = osp.join(dataset_root, "JPEGImages")
 test_images_id_file = osp.join(dataset_root, "ImageSets/Main/test_split_new.txt") #split_dataset_new
 
 
-input_results_file = "pkl_results/results_testset.pkl"
-out_results_name = "results_testset_split_new_best_merge_allimages.pkl"
+input_results_file = "pkl_results/results_testset_resampled_finetune.pkl"
+out_results_name = "results_testset_resampled_finetune_merged.pkl"
 
 pkl_save_dir = "./pkl_results_merge"
 if not osp.exists(pkl_save_dir):
@@ -46,14 +46,14 @@ with open(test_images_id_file, "r") as f:
 with open(org_images_id_file, "r") as f:
     org_imageids = [file.strip() for file in f.readlines()]
     
-score_thresh = 0.5
+score_thresh = 0.4
 nms_cfg = dict(type="soft_nms", iou_thr=0.3)
 
 final_results = []
 wind_size = 1080
 overlap = 360
 stride = wind_size-overlap
-episod=5
+episod=10
 score_desent = 0.61
 
 # org_imageids = ["00013868"]
@@ -71,7 +71,7 @@ for i in tqdm(range(len(org_imageids))):
         #print(split_imageid, org_imageid)
         if split_imageid == org_imageid:
             split_result = input_results[j][0]
-            print(split_result.shape, offset_x, offset_y)
+            #print(split_result.shape, offset_x, offset_y)
             #print("equal", split_imageid, org_imageid)
             #remove box on left line
             if offset_x != 0:
